@@ -8,17 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
+    var onResetConfiguration: () -> Void
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            Tab("Feed", systemImage: "play.rectangle.fill") {
+                FeedView()
+            }
+
+            Tab("Local", systemImage: "arrow.down.circle.fill") {
+                LocalFeedView()
+            }
+
+            Tab("Settings", systemImage: "gearshape") {
+                SettingsView(onResetConfiguration: onResetConfiguration)
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(onResetConfiguration: {})
 }

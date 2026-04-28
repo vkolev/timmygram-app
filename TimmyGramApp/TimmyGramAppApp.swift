@@ -1,17 +1,20 @@
-//
-//  TimmyGramAppApp.swift
-//  TimmyGramApp
-//
-//  Created by Vladimir Kolev on 28.04.26.
-//
-
 import SwiftUI
 
 @main
 struct TimmyGramAppApp: App {
+    @State private var isConfigured = KeychainService.loadConfig() != nil
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if isConfigured {
+                ContentView {
+                    isConfigured = false
+                }
+            } else {
+                OnboardingView {
+                    isConfigured = true
+                }
+            }
         }
     }
 }
