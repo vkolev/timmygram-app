@@ -85,6 +85,22 @@ enum APIClient {
         return data
     }
     
+    static func likeVideo(videoId: Int) async -> Int? {
+        guard let request = prepareRequest(path: "/api/v1/videos/\(videoId)/likes", method: "POST") else {
+            return nil
+        }
+
+        guard let (data, response) = try? await URLSession.shared.data(for: request),
+              let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let likes = json["likes_count"] as? Int else {
+            return nil
+        }
+
+        return likes
+    }
+
     static func fetchNextVideo() async throws -> Video {
         guard let request = prepareRequest(path: "/api/v1/next") else {
             throw APIError.notConfigured

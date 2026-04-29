@@ -6,12 +6,14 @@ struct Video: Codable, Identifiable, Hashable {
     let title: String
     let thumbnailUrl: String
     let streamUrl: String
+    var likes_count: Int
 
     enum CodingKeys: String, CodingKey {
         case id
         case title
         case thumbnailUrl = "thumbnail_url"
         case streamUrl = "stream_url"
+        case likes_count
     }
 
     var resolvedThumbnailUrl: URL? {
