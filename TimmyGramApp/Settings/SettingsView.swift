@@ -24,6 +24,9 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+            .scrollContentBackground(.hidden)
+            .background(ContentView.appGradient.ignoresSafeArea())
             .confirmationDialog(
                 "Reset Configuration?",
                 isPresented: $showResetConfirmation,

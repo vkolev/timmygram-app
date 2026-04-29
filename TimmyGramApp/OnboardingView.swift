@@ -14,11 +14,14 @@ struct OnboardingView: View {
     @AppStorage("deviceDescription") private var deviceDescription = ""
 
     var body: some View {
-        if showDeviceInfo {
-            deviceInfoStep
-        } else {
-            scannerStep
+        Group {
+            if showDeviceInfo {
+                deviceInfoStep
+            } else {
+                scannerStep
+            }
         }
+        .background(ContentView.appGradient.ignoresSafeArea())
     }
 
     private var scannerStep: some View {

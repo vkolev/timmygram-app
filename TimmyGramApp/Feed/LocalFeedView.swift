@@ -9,6 +9,8 @@ struct LocalFeedView: View {
                 description: Text("Downloaded videos will appear here.")
             )
             .navigationTitle("Local Feed")
+            .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+            .background(ContentView.appGradient.ignoresSafeArea())
         }
     }
 }

@@ -8,6 +8,7 @@ import AVFoundation
 import AVKit
 import OSLog
 import SwiftUI
+import UIKit
 
 private let logger = Logger(subsystem: "net.vkolev.TimmyGramApp", category: "VideoPlayer")
 
@@ -65,7 +66,10 @@ struct VideoPlayerView: UIViewControllerRepresentable {
         guard let config = KeychainService.loadConfig() else {
             return AVURLAsset(url: url)
         }
-        let headers = ["Authorization": "Bearer \(config.token)"]
+        let headers: [String: String] = [
+            "Authorization": "Bearer \(config.token)",
+            "X-Device-ID": UIDevice.current.identifierForVendor?.uuidString ?? ""
+        ]
         return AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": headers])
     }
 

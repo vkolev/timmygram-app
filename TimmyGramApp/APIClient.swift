@@ -55,9 +55,13 @@ enum APIClient {
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+        let httpResponse = response as? HTTPURLResponse
+        if httpResponse?.statusCode == 403 {
+            let message = (try? JSONDecoder().decode(APIErrorResponse.self, from: data))?.error ?? "Access denied"
+            throw APIError.forbidden(message)
+        }
+        guard let httpResponse, (200...299).contains(httpResponse.statusCode) else {
+            let code = httpResponse?.statusCode ?? -1
             logger.error("Feed request failed with status \(code)")
             throw APIError.requestFailed
         }
@@ -89,8 +93,12 @@ enum APIClient {
         let (data, response) = try await URLSession.shared.data(for: request)
         logger.info("Response for next: \(response)")
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
+        let httpResponse = response as? HTTPURLResponse
+        if httpResponse?.statusCode == 403 {
+            let message = (try? JSONDecoder().decode(APIErrorResponse.self, from: data))?.error ?? "Access denied"
+            throw APIError.forbidden(message)
+        }
+        guard let httpResponse, (200...299).contains(httpResponse.statusCode) else {
             throw APIError.requestFailed
         }
 
@@ -98,9 +106,27 @@ enum APIClient {
     }
 }
 
-enum APIError: Error {
+enum APIError: LocalizedError {
     case notConfigured
     case requestFailed
+    case forbidden(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .notConfigured: "API not configured"
+        case .requestFailed: "Request failed"
+        case .forbidden(let message): message
+        }
+    }
+
+    var isForbidden: Bool {
+        if case .forbidden = self { return true }
+        return false
+    }
+}
+
+private struct APIErrorResponse: Decodable {
+    let error: String
 }
 
 struct FeedPage: Decodable {

@@ -9,11 +9,25 @@ struct FeedView: View {
     @State private var selectedVideo: Video?
     @State private var nextPage: String?
     @State private var hasLoadedInitialPage = false
+    @State private var forbiddenMessage: String?
 
     var body: some View {
         NavigationStack {
             Group {
-                if videos.isEmpty && isLoading {
+                if let forbiddenMessage {
+                    ContentUnavailableView {
+                        Label {
+                            Text("Access Denied")
+                        } icon: {
+                            Image("sad-face")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 64, height: 64)
+                        }
+                    } description: {
+                        Text(forbiddenMessage)
+                    }
+                } else if videos.isEmpty && isLoading {
                     ContentUnavailableView {
                         ProgressView()
                             .controlSize(.large)
@@ -50,6 +64,9 @@ struct FeedView: View {
                 }
             }
             .navigationTitle("Feed")
+            .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+            .scrollContentBackground(.hidden)
+            .background(ContentView.appGradient.ignoresSafeArea())
             .task { await loadMore() }
             .refreshable { await refresh() }
             .navigationDestination(item: $selectedVideo) { video in
@@ -70,6 +87,8 @@ struct FeedView: View {
             videos.append(contentsOf: feedPage.videos)
             nextPage = feedPage.nextPage
             hasLoadedInitialPage = true
+        } catch let error as APIError where error.isForbidden {
+            forbiddenMessage = error.errorDescription
         } catch {
             logger.error("Failed to load feed: \(error)")
         }
@@ -80,10 +99,14 @@ struct FeedView: View {
         defer { isLoading = false }
 
         do {
+            forbiddenMessage = nil
             let feedPage = try await APIClient.fetchFeed()
             videos = feedPage.videos
             nextPage = feedPage.nextPage
             hasLoadedInitialPage = true
+        } catch let error as APIError where error.isForbidden {
+            videos = []
+            forbiddenMessage = error.errorDescription
         } catch {
             logger.error("Failed to refresh feed: \(error)")
         }
