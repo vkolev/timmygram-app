@@ -8,18 +8,12 @@ import SwiftUI
 //import Combine
 
 struct FullVideoView: View {
-    let currentVideo: Video
-    @ObservedObject private var viewModel: VideoViewModel
+    @StateObject private var viewModel: VideoViewModel
     @State private var offset: CGSize = .zero
-    @State private var currentIndex: Int
-    
-    init(currentVideo: Video, viewModel: VideoViewModel) {
-        self.currentVideo = currentVideo
-        self.viewModel = viewModel
-        self._currentIndex = State(
-            initialValue: viewModel.videos
-                .firstIndex(where: { $0.id == currentVideo.id }) ?? 0
-        )
+    @State private var currentIndex = 0
+
+    init(video: Video) {
+        self._viewModel = StateObject(wrappedValue: VideoViewModel(startingWith: video))
     }
 
     var body: some View {
@@ -39,6 +33,13 @@ struct FullVideoView: View {
                         .overlay(alignment: .bottom) {
                             videoOverlay
                         }
+                        .overlay {
+                            if viewModel.isLoadingNext {
+                                ProgressView()
+                                    .tint(.white)
+                                    .scaleEffect(1.5)
+                            }
+                        }
                         .offset(y: offset.height)
                         .transition(.asymmetric(
                             insertion: .move(edge: .bottom),
@@ -50,13 +51,21 @@ struct FullVideoView: View {
                                     offset = gesture.translation
                                 }
                                 .onEnded { gesture in
-                                    if gesture.translation.height < -50
-                                        && currentIndex < viewModel.videos.count - 1
-                                    {
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            currentIndex += 1
+                                    if gesture.translation.height < -50 {
+                                        if currentIndex < viewModel.videos.count - 1 {
+                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                currentIndex += 1
+                                            }
+                                        } else {
+                                            Task {
+                                                let success = await viewModel.fetchNextVideo()
+                                                if success {
+                                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                                        currentIndex += 1
+                                                    }
+                                                }
+                                            }
                                         }
-                                        viewModel.preloadNextVideo()
                                     } else if gesture.translation.height > 50
                                         && currentIndex > 0
                                     {

@@ -9,9 +9,19 @@ struct OnboardingView: View {
 
     @State private var showScanner = false
     @State private var errorMessage: String?
-    @State private var isConfigured = false
+    @State private var showDeviceInfo = false
+    @AppStorage("deviceName") private var deviceName = ""
+    @AppStorage("deviceDescription") private var deviceDescription = ""
 
     var body: some View {
+        if showDeviceInfo {
+            deviceInfoStep
+        } else {
+            scannerStep
+        }
+    }
+
+    private var scannerStep: some View {
         VStack(spacing: 24) {
             Spacer()
 
@@ -79,6 +89,68 @@ struct OnboardingView: View {
         }
     }
 
+    private var deviceInfoStep: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "iphone.gen3")
+                .font(.system(size: 80))
+                .foregroundStyle(.tint)
+
+            Text("Name Your Device")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text("Give this device a name and description so you can identify it on the server.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+
+            VStack(spacing: 16) {
+                TextField("Device Name", text: $deviceName)
+                    .textFieldStyle(.roundedBorder)
+
+                TextField("Device Description (optional)", text: $deviceDescription)
+                    .textFieldStyle(.roundedBorder)
+            }
+            .padding(.horizontal, 40)
+
+            Spacer()
+
+            Button {
+                finishOnboarding()
+            } label: {
+                Text("Continue")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .padding(.horizontal, 40)
+
+            Button {
+                deviceName = ""
+                deviceDescription = ""
+                finishOnboarding()
+            } label: {
+                Text("Skip")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .padding(.horizontal, 40)
+
+            Spacer()
+        }
+    }
+
+    private func finishOnboarding() {
+        Task {
+            try? await APIClient.pingDevice()
+        }
+        onConfigured()
+    }
+
     private func handleScannedPayload(_ payload: String) {
         logger.info("QR code scanned, raw payload: \(payload)")
 
@@ -104,12 +176,7 @@ struct OnboardingView: View {
             try KeychainService.save(config: config)
             logger.info("Config saved to Keychain")
             showScanner = false
-
-            Task {
-                try? await APIClient.pingDevice()
-            }
-
-            onConfigured()
+            showDeviceInfo = true
         } catch is DecodingError {
             logger.error("Decoding failed for payload: \(payload)")
             errorMessage = "QR code does not contain valid server configuration."

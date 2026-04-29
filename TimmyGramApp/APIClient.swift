@@ -17,6 +17,7 @@ enum APIClient {
         request.httpMethod = method
         request.setValue("Bearer \(config.token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(UIDevice.current.identifierForVendor?.uuidString ?? "", forHTTPHeaderField: "X-Device-ID")
         return request
     }
 
@@ -25,9 +26,14 @@ enum APIClient {
             throw APIError.notConfigured
         }
 
+        let storedName = UserDefaults.standard.string(forKey: "deviceName") ?? ""
+        let effectiveName = storedName.isEmpty ? UIDevice.current.name : storedName
+        let description = UserDefaults.standard.string(forKey: "deviceDescription") ?? ""
+
         let body = DevicePingRequest(
             deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "",
-            deviceName: UIDevice.current.name
+            deviceName: effectiveName,
+            deviceDescription: description
         )
         request.httpBody = try JSONEncoder().encode(body)
 
@@ -39,8 +45,9 @@ enum APIClient {
         }
     }
 
-    static func fetchFeed() async throws -> [Video] {
-        guard let request = prepareRequest(path: "/api/v1/feed") else {
+    static func fetchFeed(page: String? = nil) async throws -> FeedPage {
+        let path = page ?? "/api/v1/feed"
+        guard let request = prepareRequest(path: path) else {
             throw APIError.notConfigured
         }
 
@@ -56,8 +63,7 @@ enum APIClient {
         }
 
         logger.info("Feed response: \(String(data: data, encoding: .utf8) ?? "nil")")
-        let feedResponse = try JSONDecoder().decode(FeedResponse.self, from: data)
-        return feedResponse.videos
+        return try JSONDecoder().decode(FeedPage.self, from: data)
     }
 
     static func fetchImageData(path: String) async throws -> Data {
@@ -75,24 +81,20 @@ enum APIClient {
         return data
     }
     
-    static func fetchNextVideo(completion: @escaping (Result<Video, Error>) -> Void) throws {
+    static func fetchNextVideo() async throws -> Video {
         guard let request = prepareRequest(path: "/api/v1/next") else {
             throw APIError.notConfigured
         }
-        
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            guard let data = data else { return }
-            do {
-                let video = try JSONDecoder().decode(Video.self, from: data)
-                completion(.success(video))
-            } catch {
-                completion(.failure(error))
-            }
-        }.resume()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        logger.info("Response for next: \(response)")
+
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.requestFailed
+        }
+
+        return try JSONDecoder().decode(VideoResponse.self, from: data).video
     }
 }
 
@@ -101,16 +103,30 @@ enum APIError: Error {
     case requestFailed
 }
 
-private struct FeedResponse: Decodable {
+struct FeedPage: Decodable {
     let videos: [Video]
+    let page: Int
+    let nextPage: String?
+
+    enum CodingKeys: String, CodingKey {
+        case videos
+        case page
+        case nextPage = "next_page"
+    }
+}
+
+private struct VideoResponse: Decodable {
+    let video: Video
 }
 
 private struct DevicePingRequest: Encodable {
     let deviceId: String
     let deviceName: String
+    let deviceDescription: String
 
     enum CodingKeys: String, CodingKey {
         case deviceId = "device_id"
         case deviceName = "device_name"
+        case deviceDescription = "device_description"
     }
 }

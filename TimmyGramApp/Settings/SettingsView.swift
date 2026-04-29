@@ -4,13 +4,15 @@ struct SettingsView: View {
     var onResetConfiguration: () -> Void
 
     @State private var showResetConfirmation = false
+    @AppStorage("deviceName") private var deviceName = ""
+    @AppStorage("deviceDescription") private var deviceDescription = ""
 
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    Text("Settings coming soon")
-                        .foregroundStyle(.secondary)
+                Section("Device") {
+                    TextField("Device Name", text: $deviceName)
+                    TextField("Device Description", text: $deviceDescription)
                 }
 
                 Section {
