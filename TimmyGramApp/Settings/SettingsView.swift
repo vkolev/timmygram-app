@@ -49,10 +49,18 @@ struct SettingsView: View {
                 .padding(.horizontal, 40)
 
             SecureField("PIN", text: $enteredPin)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(.plain)
                 .keyboardType(.numberPad)
-                .frame(width: 120)
+                .font(.title2)
+                .frame(width: 200)
                 .multilineTextAlignment(.center)
+                .padding(.vertical, 14)
+                .padding(.horizontal, 20)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.accentColor, lineWidth: 2)
+                        .fill(.ultraThinMaterial)
+                )
                 .onChange(of: enteredPin) { _, newValue in
                     let filtered = String(newValue.filter { $0.isNumber }.prefix(4))
                     if filtered != newValue { enteredPin = filtered }
