@@ -1,6 +1,7 @@
 import Foundation
 import Security
 
+nonisolated
 enum KeychainService {
     private static let service = "com.timmygram.api"
     private static let serverUrlAccount = "serverUrl"
