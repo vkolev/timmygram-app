@@ -2,6 +2,9 @@
 
 It is the iOS app that can consume the self-hosted TimmyGram Server by setting up by parent.
 
+
+![screens/1_setup.png](screens/1_setup.png) ![screens/2_feed.png](screens/2_feed.png) ![screens/3_local_feed.png](screens/3_local_feed.png) ![screens/4_settings_lock.png](screens/4_settings_lock.png) ![screens/5_settings.png](screens/5_settings.png) 
+
 ## How does it work?
 
 - A parent sets up a timmygram-server and uploads videos
