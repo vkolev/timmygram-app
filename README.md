@@ -3,7 +3,11 @@
 It is the iOS app that can consume the self-hosted TimmyGram Server by setting up by parent.
 
 
-![screens/1_setup.png](screens/1_setup.png|100) ![screens/2_feed.png](screens/2_feed.png|100) ![screens/3_local_feed.png](screens/3_local_feed.png|100) ![screens/4_settings_lock.png](screens/4_settings_lock.png|100) ![screens/5_settings.png](screens/5_settings.png|100) 
+<a href="screens/1_setup.png"><img src="screens/1_setup.png" width="100" /></a>
+<a href="screens/2_feed.png"><img src="screens/2_feed.png" width="100" /></a>
+<a href="screens/3_local_feed.png"><img src="screens/3_local_feed.png" width="100" /></a>
+<a href="screens/4_settings_lock.png"><img src="screens/4_settings_lock.png" width="100"></a>
+<a href="screens/5_settings.png"><img src="screens/5_settings.png" width="100"></a>
 
 ## How does it work?
 
