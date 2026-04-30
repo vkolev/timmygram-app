@@ -5,6 +5,7 @@ enum KeychainService {
     private static let service = "com.timmygram.api"
     private static let serverUrlAccount = "serverUrl"
     private static let tokenAccount = "jwtToken"
+    private static let settingsPinAccount = "settingsPin"
 
     static func save(config: ServerConfig) throws {
         try save(value: config.serverUrl, account: serverUrlAccount)
@@ -22,6 +23,19 @@ enum KeychainService {
     static func deleteConfig() {
         delete(account: serverUrlAccount)
         delete(account: tokenAccount)
+        delete(account: settingsPinAccount)
+    }
+
+    static func saveSettingsPin(_ pin: String) throws {
+        try save(value: pin, account: settingsPinAccount)
+    }
+
+    static func loadSettingsPin() -> String? {
+        load(account: settingsPinAccount)
+    }
+
+    static func deleteSettingsPin() {
+        delete(account: settingsPinAccount)
     }
 
     private static func save(value: String, account: String) throws {

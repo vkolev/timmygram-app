@@ -32,7 +32,8 @@ struct LocalFeedView: View {
             .scrollContentBackground(.hidden)
             .background(ContentView.appGradient.ignoresSafeArea())
             .navigationDestination(item: $selectedVideo) { video in
-                LocalVideoPlayerView(video: video)
+                let index = downloadManager.downloadedVideos.firstIndex(of: video) ?? 0
+                LocalVideoPlayerView(videos: downloadManager.downloadedVideos, startIndex: index)
             }
         }
     }
