@@ -1,6 +1,6 @@
 # TimmyGram App
 
-It is the iOS app that can consume the self-hosted TimmyGram Server by setting up by parent.
+It is the iOS app that can consume the self-hosted [TimmyGram Server](https://github.com/vkolev/timmygram-server) by setting up by parent.
 
 
 <a href="screens/1_setup.png"><img src="screens/1_setup.png" width="100" /></a>
@@ -11,7 +11,7 @@ It is the iOS app that can consume the self-hosted TimmyGram Server by setting u
 
 ## How does it work?
 
-- A parent sets up a timmygram-server and uploads videos
+- A parent sets up a [timmygram-server](https://github.com/vkolev/timmygram-server) and uploads videos
 - When the app is started the parent has the option to connect the app to the server
   - Scan a QR-Code to add the device to the server
   - Enter manually server URL and PIN to connect to the server
@@ -20,7 +20,7 @@ It is the iOS app that can consume the self-hosted TimmyGram Server by setting u
  
 ## What the app does
 
-It connects to the timmygram-server and loads a `/feed` of short videos
+It connects to the [timmygram-server](https://github.com/vkolev/timmygram-server) and loads a `/feed` of short videos
 
 A child can select a video and it plays in full-screen with swipe up and down gestures to skip to next or previous video respectively.
 
