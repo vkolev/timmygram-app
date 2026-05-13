@@ -171,12 +171,18 @@ struct OnboardingView: View {
             Button {
                 finishOnboarding()
             } label: {
-                Text("Continue")
-                    .frame(maxWidth: .infinity)
+                if isConnecting {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Text("Continue")
+                        .frame(maxWidth: .infinity)
+                }
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .padding(.horizontal, 40)
+            .disabled(isConnecting)
 
             Button {
                 deviceName = ""
@@ -190,6 +196,7 @@ struct OnboardingView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .padding(.horizontal, 40)
+            .disabled(isConnecting)
 
             Spacer()
         }
@@ -328,10 +335,16 @@ struct OnboardingView: View {
         if settingsPin.count == 4 {
             try? KeychainService.saveSettingsPin(settingsPin)
         }
+        isConnecting = true
         Task {
-            try? await APIClient.pingDevice()
+            do {
+                try await APIClient.pingDevice()
+            } catch {
+                logger.error("Ping failed: \(error)")
+            }
+            isConnecting = false
+            onConfigured()
         }
-        onConfigured()
     }
 
     private func handleScannedPayload(_ payload: String) {
