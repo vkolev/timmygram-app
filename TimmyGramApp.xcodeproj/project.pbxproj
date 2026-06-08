@@ -6,11 +6,27 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		75341F1A2FD69B15006FCC28 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 75FD66EB2FA0BD510058196E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 75FD66F22FA0BD510058196E;
+			remoteInfo = TimmyGramApp;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		75341F162FD69B15006FCC28 /* TimmyGramApplicationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimmyGramApplicationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		75FD66F32FA0BD510058196E /* TimmyGramApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimmyGramApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		75341F172FD69B15006FCC28 /* TimmyGramApplicationTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TimmyGramApplicationTests;
+			sourceTree = "<group>";
+		};
 		75FD66F52FA0BD510058196E /* TimmyGramApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TimmyGramApp;
@@ -19,6 +35,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		75341F132FD69B15006FCC28 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		75FD66F02FA0BD510058196E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				75FD66F52FA0BD510058196E /* TimmyGramApp */,
+				75341F172FD69B15006FCC28 /* TimmyGramApplicationTests */,
 				75FD66F42FA0BD510058196E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				75FD66F32FA0BD510058196E /* TimmyGramApp.app */,
+				75341F162FD69B15006FCC28 /* TimmyGramApplicationTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +73,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		75341F152FD69B15006FCC28 /* TimmyGramApplicationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 75341F1C2FD69B15006FCC28 /* Build configuration list for PBXNativeTarget "TimmyGramApplicationTests" */;
+			buildPhases = (
+				75341F122FD69B15006FCC28 /* Sources */,
+				75341F132FD69B15006FCC28 /* Frameworks */,
+				75341F142FD69B15006FCC28 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				75341F1B2FD69B15006FCC28 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				75341F172FD69B15006FCC28 /* TimmyGramApplicationTests */,
+			);
+			name = TimmyGramApplicationTests;
+			packageProductDependencies = (
+			);
+			productName = TimmyGramApplicationTests;
+			productReference = 75341F162FD69B15006FCC28 /* TimmyGramApplicationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		75FD66F22FA0BD510058196E /* TimmyGramApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 75FD66FE2FA0BD520058196E /* Build configuration list for PBXNativeTarget "TimmyGramApp" */;
@@ -77,9 +125,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2640;
+				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
+					75341F152FD69B15006FCC28 = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = 75FD66F22FA0BD510058196E;
+					};
 					75FD66F22FA0BD510058196E = {
 						CreatedOnToolsVersion = 26.4.1;
 					};
@@ -100,11 +152,19 @@
 			projectRoot = "";
 			targets = (
 				75FD66F22FA0BD510058196E /* TimmyGramApp */,
+				75341F152FD69B15006FCC28 /* TimmyGramApplicationTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		75341F142FD69B15006FCC28 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		75FD66F12FA0BD510058196E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +175,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		75341F122FD69B15006FCC28 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		75FD66EF2FA0BD510058196E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +191,59 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		75341F1B2FD69B15006FCC28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 75FD66F22FA0BD510058196E /* TimmyGramApp */;
+			targetProxy = 75341F1A2FD69B15006FCC28 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		75341F1D2FD69B15006FCC28 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8LR2463F33;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vkolev.TimmyGramApplicationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TimmyGramApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TimmyGramApp";
+			};
+			name = Debug;
+		};
+		75341F1E2FD69B15006FCC28 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8LR2463F33;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vkolev.TimmyGramApplicationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TimmyGramApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TimmyGramApp";
+			};
+			name = Release;
+		};
 		75FD66FC2FA0BD520058196E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -320,6 +439,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		75341F1C2FD69B15006FCC28 /* Build configuration list for PBXNativeTarget "TimmyGramApplicationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				75341F1D2FD69B15006FCC28 /* Debug */,
+				75341F1E2FD69B15006FCC28 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		75FD66EE2FA0BD510058196E /* Build configuration list for PBXProject "TimmyGramApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

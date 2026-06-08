@@ -4,7 +4,15 @@ import UIKit
 
 private let logger = Logger(subsystem: "net.vkolev.TimmyGramApp", category: "APIClient")
 
+protocol HTTPClient: Sendable {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: HTTPClient {}
+
 enum APIClient {
+    static var httpClient: HTTPClient = URLSession.shared
+
     static func prepareRequest(path: String, method: String = "GET") -> URLRequest? {
         guard let config = KeychainService.loadConfig(),
               let baseUrl = URL(string: config.serverUrl),
@@ -13,35 +21,98 @@ enum APIClient {
             return nil
         }
 
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString
+        if deviceId == nil {
+            logger.warning("identifierForVendor is nil while preparing request for path: \(path)")
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("Bearer \(config.token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(UIDevice.current.identifierForVendor?.uuidString ?? "", forHTTPHeaderField: "X-Device-ID")
+        request.setValue(deviceId ?? "", forHTTPHeaderField: "X-Device-ID")
         return request
     }
 
-    static func pingDevice() async throws {
-        guard var request = prepareRequest(path: "/api/v1/devices/ping", method: "POST") else {
+    static func pingDevice(
+        httpClient: HTTPClient? = nil,
+        deviceIdProvider: () async -> String? = { await DeviceIdentifier.waitForIdentifier() },
+        configProvider: () -> ServerConfig? = { KeychainService.loadConfig() },
+        deviceNameFallback: String? = nil,
+        defaults: UserDefaults = .standard,
+        maxAttempts: Int = 3
+    ) async throws {
+        let client = httpClient ?? Self.httpClient
+
+        guard let deviceId = await deviceIdProvider(), !deviceId.isEmpty else {
+            logger.error("Device identifier unavailable after polling")
+            throw APIError.deviceIdentifierUnavailable
+        }
+
+        guard let config = configProvider(),
+              let baseUrl = URL(string: config.serverUrl),
+              let url = URL(string: "/api/v1/devices/ping", relativeTo: baseUrl) else {
             throw APIError.notConfigured
         }
 
-        let storedName = UserDefaults.standard.string(forKey: "deviceName") ?? ""
-        let effectiveName = storedName.isEmpty ? UIDevice.current.name : storedName
-        let description = UserDefaults.standard.string(forKey: "deviceDescription") ?? ""
+        let storedName = defaults.string(forKey: "deviceName") ?? ""
+        let fallbackName: String
+        if let provided = deviceNameFallback {
+            fallbackName = provided
+        } else {
+            fallbackName = await MainActor.run { UIDevice.current.name }
+        }
+        let effectiveName = storedName.isEmpty ? fallbackName : storedName
+        let description = defaults.string(forKey: "deviceDescription") ?? ""
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(config.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(deviceId, forHTTPHeaderField: "X-Device-ID")
 
         let body = DevicePingRequest(
-            deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "",
+            deviceId: deviceId,
             deviceName: effectiveName,
             deviceDescription: description
         )
         request.httpBody = try JSONEncoder().encode(body)
 
-        let (_, response) = try await URLSession.shared.data(for: request)
+        let backoffs: [TimeInterval] = [0.5, 1.0, 2.0]
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            throw APIError.requestFailed
+        for attempt in 0..<maxAttempts {
+            do {
+                let (_, response) = try await client.data(for: request)
+
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw APIError.requestFailed
+                }
+
+                let status = httpResponse.statusCode
+                if (200...299).contains(status) {
+                    return
+                }
+
+                if (400...499).contains(status) {
+                    logger.error("Ping failed with non-retryable status \(status)")
+                    throw APIError.requestFailed
+                }
+
+                logger.error("Ping attempt \(attempt + 1) failed with status \(status)")
+                if attempt == maxAttempts - 1 {
+                    throw APIError.requestFailed
+                }
+            } catch let error as APIError {
+                throw error
+            } catch {
+                logger.error("Ping attempt \(attempt + 1) network error: \(error.localizedDescription)")
+                if attempt == maxAttempts - 1 {
+                    throw APIError.networkUnavailable
+                }
+            }
+
+            let delay = backoffs[min(attempt, backoffs.count - 1)]
+            try? await Task.sleep(for: .seconds(delay))
         }
     }
 
@@ -126,12 +197,16 @@ enum APIError: LocalizedError {
     case notConfigured
     case requestFailed
     case forbidden(String)
+    case deviceIdentifierUnavailable
+    case networkUnavailable
 
     var errorDescription: String? {
         switch self {
         case .notConfigured: "API not configured"
         case .requestFailed: "Request failed"
         case .forbidden(let message): message
+        case .deviceIdentifierUnavailable: "Could not determine device identifier. Please try again."
+        case .networkUnavailable: "Could not reach the server. Check your connection and try again."
         }
     }
 
@@ -161,7 +236,7 @@ private struct VideoResponse: Decodable {
     let video: Video
 }
 
-private struct DevicePingRequest: Encodable {
+struct DevicePingRequest: Encodable {
     let deviceId: String
     let deviceName: String
     let deviceDescription: String

@@ -137,6 +137,14 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.callout)
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+            }
+
             VStack(spacing: 16) {
                 TextField("Device Name", text: $deviceName)
                     .textFieldStyle(.roundedBorder)
@@ -335,15 +343,23 @@ struct OnboardingView: View {
         if settingsPin.count == 4 {
             try? KeychainService.saveSettingsPin(settingsPin)
         }
+
+        UserDefaults.standard.set(deviceName, forKey: "deviceName")
+        UserDefaults.standard.set(deviceDescription, forKey: "deviceDescription")
+
         isConnecting = true
+        errorMessage = nil
         Task {
             do {
                 try await APIClient.pingDevice()
+                isConnecting = false
+                onConfigured()
             } catch {
                 logger.error("Ping failed: \(error)")
+                errorMessage = (error as? LocalizedError)?.errorDescription
+                    ?? "Could not register this device with the server. Tap Continue to try again."
+                isConnecting = false
             }
-            isConnecting = false
-            onConfigured()
         }
     }
 
